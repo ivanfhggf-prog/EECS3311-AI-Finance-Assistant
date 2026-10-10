@@ -1,0 +1,34 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLSequenceAllInOne</id><coordinates><x>10</x><y>10</y><w>1610</w><h>1450</h></coordinates><panel_attributes>title=SD07 - Manage Savings Goal and Export Report (UC10, UC11, F12, F13)
+obj=User~a
+obj=FinanceGUI~b
+obj=AgentFacade~c
+obj=Agent\nController~d
+obj=SavingsGoal~e
+obj=Transaction\nRepository~f
+obj=Report\nGenerator~g
+a-&gt;b : == Manage savings goal == enter goal name, target amount, target date
+b-&gt;c : saveGoal(data)
+c-&gt;d : processRequest(goalRequest)
+d-&gt;e : [valid input] setTarget(amount, date)
+d-&gt;f : [valid input] findByMonth(month)
+f.&gt;d : [valid input] transactions
+d-&gt;e : [valid input] updateProgress(amount)
+d.&gt;c : [valid input] goal with progress
+c.&gt;b : [valid input] goal with progress
+b.&gt;a : [valid input] display progress bar
+d.&gt;c : [past date or invalid amount] error(reason)
+c.&gt;b : [past date or invalid amount] error(reason)
+b.&gt;a : [past date or invalid amount] explain rejection
+a-&gt;b : == Export report == choose date range and format, click Export
+b-&gt;c : exportReport(range, format)
+c-&gt;d : processRequest(exportRequest)
+d-&gt;f : findByMonth(month)
+f.&gt;d : transactions
+d-&gt;g : [data exists in range] export(data, format)
+g.&gt;d : [data exists in range] File
+d.&gt;c : [data exists in range] File
+c.&gt;b : [data exists in range] File
+b.&gt;a : [data exists in range] offer download
+d.&gt;c : [no data in range] warning (no file generated)
+c.&gt;b : [no data in range] warning
+b.&gt;a : [no data in range] warn no data in range</panel_attributes><additional_attributes></additional_attributes></element></diagram>

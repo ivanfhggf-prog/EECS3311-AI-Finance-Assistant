@@ -1,0 +1,53 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLSequenceAllInOne</id><coordinates><x>10</x><y>10</y><w>3470</w><h>1600</h></coordinates><panel_attributes>title=SD02 - Categorize Transactions and Manual Correction (UC02, F02, F03)
+obj=User~a
+obj=FinanceGUI~b
+obj=AgentFacade~c
+obj=Agent\nController~d
+obj=Transaction\nRepository~e
+obj=Planner~f
+obj=Tool\nManager~g
+obj=ToolFactory~h
+obj=Categorizer\nTool~i
+obj=Prompt\nBuilder~j
+obj=Claude\nProvider~k
+obj=LLM\nService~l
+obj=Memory\nManager~m
+obj=CorrectCategory\nCommand~n
+a-&gt;b : == Automatic categorization == click Categorize (or runs after import)
+b-&gt;c : categorizeAll()
+c-&gt;d : processRequest(categorizeRequest)
+d-&gt;f : decompose(request)
+f.&gt;d : Plan
+d-&gt;e : findByMonth(month)
+e.&gt;d : uncategorized transactions
+d-&gt;f : executePlan(plan, transactions)
+f-&gt;g : executeTool(categorizer, args)
+g-&gt;h : createTool(categorizer)
+h.&gt;g : CategorizerTool
+g-&gt;j : buildPrompt(context)
+j.&gt;g : prompt
+g-&gt;k : generate(prompt)
+k-&gt;l : API request
+l.&gt;k : response
+k.&gt;g : response text
+g-&gt;i : execute(input)
+i.&gt;g : [recognized category] Category per transaction
+i.&gt;g : [unrecognized or low confidence] Uncategorized, flagged for review
+g.&gt;f : Result
+f.&gt;d : Result
+d-&gt;e : [loop: each transaction] save(transaction)
+d.&gt;c : Result
+c.&gt;b : categorized transactions
+b.&gt;a : display color-coded transactions
+a-&gt;b : == Manual correction == choose new category
+b-&gt;c : correctCategory(txId, category)
+c-&gt;d : handle(correctCategoryCommand)
+d-&gt;n : execute()
+n-&gt;e : [valid transaction and category] save(transaction)
+n-&gt;m : [valid transaction and category] store(correction)
+n.&gt;d : [valid transaction and category] success
+n.&gt;d : [invalid] error
+d.&gt;c : Result
+c.&gt;b : Result
+b.&gt;a : updated category or error message
+</panel_attributes><additional_attributes></additional_attributes></element></diagram>

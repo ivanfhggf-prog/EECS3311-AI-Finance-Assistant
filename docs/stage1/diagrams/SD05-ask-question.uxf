@@ -1,0 +1,52 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLSequenceAllInOne</id><coordinates><x>10</x><y>10</y><w>2890</w><h>1920</h></coordinates><panel_attributes>title=SD05 - Ask Financial Question (UC07, F09)
+desc=FinanceCLI follows the same path via askQuery(text)
+obj=User~a
+obj=FinanceGUI~b
+obj=AgentFacade~c
+obj=Agent\nController~d
+obj=Memory\nManager~e
+obj=Planner~f
+obj=Transaction\nRepository~g
+obj=Tool\nManager~h
+obj=ToolFactory~i
+obj=QueryTool~j
+obj=Prompt\nBuilder~k
+obj=Claude\nProvider~l
+obj=LLM\nService~m
+a-&gt;b : type question in chat panel
+b-&gt;c : askQuery(text)
+c-&gt;d : processRequest(queryRequest)
+d-&gt;e : retrieve(context)
+e.&gt;d : relevant history
+d-&gt;f : decompose(request)
+f.&gt;d : [question ambiguous] clarification needed
+d.&gt;c : [question ambiguous] clarifying question
+c.&gt;b : [question ambiguous] clarifying question
+b.&gt;a : [question ambiguous] ask for clarification
+f.&gt;d : [question clear] Plan
+d-&gt;g : [question clear] findByMonth(month)
+g.&gt;d : [question clear] transactions
+d-&gt;f : [question clear] executePlan(plan, transactions)
+f-&gt;h : [question clear] executeTool(query, args)
+h-&gt;i : [question clear] createTool(query)
+i.&gt;h : [question clear] QueryTool
+h-&gt;k : [question clear] buildPrompt(context)
+k.&gt;h : [question clear] prompt
+h-&gt;l : [question clear] generate(prompt)
+l-&gt;m : [question clear] API request
+m.&gt;l : [question clear, LLM available] response
+l.&gt;h : [question clear, LLM available] response text
+h-&gt;j : [question clear, LLM available] execute(input)
+j.&gt;h : [question clear, LLM available] answer with supporting figures
+h.&gt;f : [question clear, LLM available] Result
+f.&gt;d : [question clear, LLM available] Result
+d-&gt;e : [question clear, LLM available] store(entry)
+d.&gt;c : [question clear, LLM available] answer
+c.&gt;b : [question clear, LLM available] answer
+b.&gt;a : [question clear, LLM available] display answer
+l.&gt;h : [question clear, LLM unavailable] error
+h.&gt;f : [question clear, LLM unavailable] error
+f.&gt;d : [question clear, LLM unavailable] error
+d.&gt;c : [question clear, LLM unavailable] error message (no fabricated answer)
+c.&gt;b : [question clear, LLM unavailable] error message
+b.&gt;a : [question clear, LLM unavailable] tell user service is unavailable</panel_attributes><additional_attributes></additional_attributes></element></diagram>

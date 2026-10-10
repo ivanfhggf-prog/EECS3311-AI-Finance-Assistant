@@ -1,0 +1,67 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLSequenceAllInOne</id><coordinates><x>10</x><y>10</y><w>3530</w><h>2260</h></coordinates><panel_attributes>title=SD06 - Monthly Summary and Saving Suggestions (UC08, UC09, F10, F11)
+obj=User~a
+obj=FinanceGUI~b
+obj=AgentFacade~c
+obj=Agent\nController~d
+obj=Planner~e
+obj=Transaction\nRepository~f
+obj=Budget~g
+obj=Tool\nManager~h
+obj=ToolFactory~i
+obj=QueryTool~j
+obj=Prompt\nBuilder~k
+obj=Claude\nProvider~l
+obj=LLM\nService~m
+obj=Report\nGenerator~n
+a-&gt;b : == Monthly summary == click Generate Summary
+b-&gt;c : generateSummary(month)
+c-&gt;d : processRequest(summaryRequest)
+d-&gt;e : decompose(request)
+e.&gt;d : Plan
+d-&gt;f : findByMonth(month)
+f.&gt;d : transactions
+d-&gt;g : getLimits()
+g.&gt;d : limits
+d-&gt;e : executePlan(plan, transactions and budget)
+e-&gt;h : executeTool(query, args)
+h-&gt;i : createTool(query)
+i.&gt;h : QueryTool
+h-&gt;k : buildPrompt(context)
+k.&gt;h : prompt
+h-&gt;l : generate(prompt)
+l-&gt;m : API request
+m.&gt;l : response
+l.&gt;h : narrative
+h-&gt;j : execute(input)
+j.&gt;h : summary text
+h.&gt;e : Result
+e.&gt;d : Result
+d-&gt;n : export(summary, display)
+n.&gt;d : formatted summary
+d.&gt;c : [month incomplete] summary labeled partial
+d.&gt;c : [month complete] full summary
+c.&gt;b : summary
+b.&gt;a : display summary
+a-&gt;b : == Saving suggestions == open Suggestions
+b-&gt;c : suggestSavings()
+c-&gt;d : processRequest(suggestionRequest)
+d-&gt;f : findByMonth(month)
+f.&gt;d : spending history
+d-&gt;g : getLimits()
+d-&gt;g : getGoals()
+d.&gt;c : [not enough data] import more history
+c.&gt;b : [not enough data] import more history
+b.&gt;a : [not enough data] explain more data is needed
+d-&gt;e : [enough data] executePlan(plan, history, budget, goals)
+e-&gt;h : [enough data] executeTool(query, args)
+h-&gt;k : [enough data] buildPrompt(context)
+h-&gt;l : [enough data] generate(prompt)
+l-&gt;m : [enough data] API request
+m.&gt;l : [enough data] response
+l.&gt;h : [enough data] suggestions text
+h.&gt;e : [enough data] Result
+e.&gt;d : [enough data] Result
+d.&gt;c : [enough data] suggestions
+c.&gt;b : [enough data] suggestions
+b.&gt;a : [enough data] display personalized suggestions
+</panel_attributes><additional_attributes></additional_attributes></element></diagram>

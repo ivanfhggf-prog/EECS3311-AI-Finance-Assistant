@@ -1,0 +1,113 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text></help_text><element><id>UMLClass</id><coordinates><x>1750</x><y>970</y><w>150</w><h>80</h></coordinates><panel_attributes>&lt;&lt;interface&gt;&gt;
+Tool
+--
+--
++execute(input): Result</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2030</x><y>710</y><w>210</w><h>110</h></coordinates><panel_attributes>&lt;&lt;interface&gt;&gt;
+LLMProvider
+--
+--
++generate(prompt: String): String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>320</x><y>290</y><w>100</w><h>100</h></coordinates><panel_attributes>&lt;&lt;interface&gt;&gt;
+Command
+--
+--
++execute()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>790</x><y>930</y><w>160</w><h>90</h></coordinates><panel_attributes>&lt;&lt;interface&gt;&gt;
+BudgetObserver
+--
+--
++update(budget: Budget)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>750</x><y>1130</y><w>140</w><h>90</h></coordinates><panel_attributes>FinanceGUI
+--
+--
++submitRequest()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1730</x><y>1160</y><w>130</w><h>80</h></coordinates><panel_attributes>FinanceCLI
+--
+--
++submitRequest()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1380</x><y>1350</y><w>190</w><h>210</h></coordinates><panel_attributes>AgentFacade
+--
+--
++importTransactions(file)
++categorizeAll()
++correctCategory(txId, category)
++createBudget(data)
++trackBudget(month)
++analyzeSpending(type)
++askQuery(text)
++generateSummary(month)
++suggestSavings()
++saveGoal(data)
++exportReport(range, format)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>920</x><y>0</y><w>210</w><h>90</h></coordinates><panel_attributes>AgentController
+--
+--
++handle(command: Command)
++processRequest(request): Result</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1430</x><y>250</y><w>220</w><h>90</h></coordinates><panel_attributes>Planner
+--
+--
++decompose(request): Plan
++executePlan(plan, context): Result</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>950</x><y>700</y><w>170</w><h>90</h></coordinates><panel_attributes>MemoryManager
+--
+--
++store(entry)
++retrieve(context): List</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1620</x><y>510</y><w>220</w><h>70</h></coordinates><panel_attributes>ToolManager
+--
+--
++executeTool(name, args): Result</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1460</x><y>720</y><w>170</w><h>80</h></coordinates><panel_attributes>ToolFactory
+--
+--
++createTool(type): Tool</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1400</x><y>1170</y><w>100</w><h>30</h></coordinates><panel_attributes>CategorizerTool</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1560</x><y>1170</y><w>120</w><h>30</h></coordinates><panel_attributes>TrendAnalysisTool</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1900</x><y>1170</y><w>100</w><h>30</h></coordinates><panel_attributes>QueryTool</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2070</x><y>1010</y><w>100</w><h>30</h></coordinates><panel_attributes>ClaudeProvider</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1670</x><y>710</y><w>200</w><h>90</h></coordinates><panel_attributes>PromptBuilder
+--
+--
++buildPrompt(context): String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>80</x><y>550</y><w>230</w><h>30</h></coordinates><panel_attributes>ImportTransactionsCommand</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>720</x><y>480</y><w>200</w><h>30</h></coordinates><panel_attributes>CorrectCategoryCommand</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>470</x><y>550</y><w>170</w><h>30</h></coordinates><panel_attributes>CreateBudgetCommand</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>110</x><y>910</y><w>150</w><h>120</h></coordinates><panel_attributes>Transaction
+--
+-id: String
+-date: Date
+-amount: Decimal
+-merchant: String
+-category: Category</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>120</x><y>1150</y><w>100</w><h>90</h></coordinates><panel_attributes>Category
+--
+-name: String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>630</x><y>680</y><w>230</w><h>140</h></coordinates><panel_attributes>Budget
+--
+-month: String
+-limits: Map
+--
++setLimits(limits)
++getLimits(): Map
++getGoals(): List
++addObserver(o: BudgetObserver)
++notifyObservers()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1030</x><y>920</y><w>170</w><h>130</h></coordinates><panel_attributes>SavingsGoal
+--
+-name: String
+-targetAmount: Decimal
+-currentAmount: Decimal
+--
++setTarget(amount, date)
++updateProgress(amount)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>100</x><y>700</y><w>180</w><h>80</h></coordinates><panel_attributes>TransactionRepository
+--
+--
++save(t: Transaction)
++findByMonth(month): List</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>970</x><y>260</y><w>180</w><h>80</h></coordinates><panel_attributes>ReportGenerator
+--
+--
++export(data, format): File</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1430</x><y>510</y><w>100</w><h>70</h></coordinates><panel_attributes>Plan
+--
+-steps: List</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2070</x><y>1160</y><w>130</w><h>80</h></coordinates><panel_attributes>Result
+--
+-success: Boolean
+-payload: Object</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>400</x><y>390</y><w>180</w><h>170</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;160;150</additional_attributes></element><element><id>Relation</id><coordinates><x>240</x><y>390</y><w>120</w><h>170</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>100;10;10;150</additional_attributes></element><element><id>Relation</id><coordinates><x>410</x><y>360</y><w>330</w><h>150</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;120;60;310;130</additional_attributes></element><element><id>Relation</id><coordinates><x>830</x><y>1020</y><w>30</w><h>120</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;10;100</additional_attributes></element><element><id>Relation</id><coordinates><x>1810</x><y>1050</y><w>160</w><h>140</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;140;120</additional_attributes></element><element><id>Relation</id><coordinates><x>1460</x><y>1030</y><w>300</w><h>150</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>280;10;10;130</additional_attributes></element><element><id>Relation</id><coordinates><x>1620</x><y>1040</y><w>150</w><h>140</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>130;10;10;120</additional_attributes></element><element><id>Relation</id><coordinates><x>2120</x><y>820</y><w>30</w><h>210</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;10;190</additional_attributes></element><element><id>Relation</id><coordinates><x>1560</x><y>1230</y><w>200</w><h>150</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;130;180;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1820</x><y>570</y><w>130</w><h>420</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;400;110;220;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1840</x><y>570</y><w>280</w><h>160</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>260;140;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1730</x><y>580</y><w>30</w><h>140</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;120;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1560</x><y>570</y><w>100</w><h>170</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;150;80;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1610</x><y>330</y><w>90</w><h>190</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>70;170;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1130</x><y>70</y><w>350</w><h>200</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>330;180;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1110</x><y>80</y><w>290</w><h>1390</h></coordinates><panel_attributes>lt=&lt;-
+m2=1
+m1=1</panel_attributes><additional_attributes>10;10;140;210;220;1340;270;1370</additional_attributes></element><element><id>Relation</id><coordinates><x>1080</x><y>90</y><w>150</w><h>850</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>90;830;130;250;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1040</x><y>90</y><w>60</w><h>190</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>40;170;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>930</x><y>80</y><w>140</w><h>640</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>120;620;10;220;90;10</additional_attributes></element><element><id>Relation</id><coordinates><x>780</x><y>90</y><w>220</w><h>610</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;590;50;580;200;500;100;300;180;10</additional_attributes></element><element><id>Relation</id><coordinates><x>890</x><y>510</y><w>120</w><h>210</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>100;190;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>850</x><y>810</y><w>200</w><h>160</h></coordinates><panel_attributes>lt=&lt;-
+m2=1
+m1=0..*</panel_attributes><additional_attributes>180;140;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>860</x><y>1210</y><w>540</w><h>290</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>520;270;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>690</x><y>810</y><w>100</w><h>340</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;80;320</additional_attributes></element><element><id>Relation</id><coordinates><x>150</x><y>1030</y><w>70</w><h>130</h></coordinates><panel_attributes>lt=&lt;-
+m1=1
+m2=0..*</panel_attributes><additional_attributes>10;110;30;10</additional_attributes></element><element><id>Relation</id><coordinates><x>180</x><y>780</y><w>50</w><h>140</h></coordinates><panel_attributes>lt=&lt;-
+m2=1
+m1=0..*</panel_attributes><additional_attributes>10;120;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>200</x><y>580</y><w>60</w><h>140</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;120;40;10</additional_attributes></element><element><id>Relation</id><coordinates><x>590</x><y>570</y><w>90</w><h>130</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>70;110;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>270</x><y>500</y><w>470</w><h>240</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;220;400;80;450;10</additional_attributes></element><element><id>Relation</id><coordinates><x>0</x><y>20</y><w>940</w><h>700</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>130;680;10;510;130;240;920;10</additional_attributes></element><element><id>UMLNote</id><coordinates><x>1410</x><y>610</y><w>170</w><h>70</h></coordinates><panel_attributes>Pattern :Factory Method</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>1750</x><y>1390</y><w>140</w><h>70</h></coordinates><panel_attributes>Pattern :Facade</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>2110</x><y>570</y><w>140</w><h>70</h></coordinates><panel_attributes>Pattern :Strategy</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>730</x><y>520</y><w>140</w><h>70</h></coordinates><panel_attributes>Pattern :Observer</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>100</x><y>110</y><w>140</w><h>70</h></coordinates><panel_attributes>Pattern :Command</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1500</x><y>670</y><w>70</w><h>70</h></coordinates><panel_attributes>
+</panel_attributes><additional_attributes>10;10;18;35;50;50</additional_attributes></element><element><id>Relation</id><coordinates><x>2160</x><y>640</y><w>40</w><h>80</h></coordinates><panel_attributes>
+</panel_attributes><additional_attributes>10;60;20;10</additional_attributes></element><element><id>Relation</id><coordinates><x>200</x><y>180</y><w>140</w><h>140</h></coordinates><panel_attributes>
+</panel_attributes><additional_attributes>120;120;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>420</x><y>80</y><w>520</w><h>290</h></coordinates><panel_attributes>lt=&lt;.
+invokes</panel_attributes><additional_attributes>10;270;318;165;500;10</additional_attributes></element><element><id>Relation</id><coordinates><x>760</x><y>590</y><w>60</w><h>100</h></coordinates><panel_attributes>
+</panel_attributes><additional_attributes>10;80;40;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1560</x><y>1430</y><w>200</w><h>100</h></coordinates><panel_attributes>
+</panel_attributes><additional_attributes>10;80;180;10</additional_attributes></element><element><id>Relation</id><coordinates><x>780</x><y>820</y><w>100</w><h>130</h></coordinates><panel_attributes>lt=&lt;.
+notifies
+m2=1
+m1=0..*</panel_attributes><additional_attributes>60;110;38;45;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1890</x><y>1030</y><w>210</w><h>150</h></coordinates><panel_attributes>lt=&lt;.
+returns</panel_attributes><additional_attributes>190;130;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1450</x><y>330</y><w>70</w><h>200</h></coordinates><panel_attributes>lt=&lt;.
+creates</panel_attributes><additional_attributes>10;180;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1600</x><y>790</y><w>180</w><h>200</h></coordinates><panel_attributes>lt=&lt;.
+creates</panel_attributes><additional_attributes>160;180;10;10</additional_attributes></element></diagram>

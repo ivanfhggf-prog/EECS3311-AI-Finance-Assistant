@@ -1,0 +1,31 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLSequenceAllInOne</id><coordinates><x>10</x><y>10</y><w>1620</w><h>1290</h></coordinates><panel_attributes>title=SD03 - Create Budget and Track Spending (UC03, F04, F05)
+desc=FinanceGUI registers with Budget via addObserver at startup (Observer)
+obj=User~a
+obj=FinanceGUI~b
+obj=AgentFacade~c
+obj=Agent\nController~d
+obj=CreateBudget\nCommand~e
+obj=Budget~f
+obj=Transaction\nRepository~g
+b-&gt;f : addObserver(this)
+a-&gt;b : == Create budget == enter monthly limits per category
+b-&gt;c : createBudget(data)
+c-&gt;d : handle(createBudgetCommand)
+d-&gt;e : execute()
+e-&gt;f : [valid limits and no budget for month] setLimits(limits)
+e.&gt;d : [valid limits and no budget for month] success
+e.&gt;d : [invalid limits or duplicate month] error(reason)
+d.&gt;c : Result
+c.&gt;b : Result
+b.&gt;a : confirmation or error
+a-&gt;b : == Track spending == open dashboard
+b-&gt;c : trackBudget(month)
+c-&gt;d : processRequest(trackRequest)
+d-&gt;g : findByMonth(month)
+g.&gt;d : transactions
+d-&gt;f : [budget exists for month] notifyObservers() after computing spent and remaining per category
+f-&gt;b : [budget exists for month] update(budget)
+b.&gt;a : [budget exists for month] progress bars and over-budget flags
+d.&gt;c : [no budget set] prompt to create budget
+c.&gt;b : [no budget set] prompt to create budget
+b.&gt;a : [no budget set] suggest creating a budget</panel_attributes><additional_attributes></additional_attributes></element></diagram>

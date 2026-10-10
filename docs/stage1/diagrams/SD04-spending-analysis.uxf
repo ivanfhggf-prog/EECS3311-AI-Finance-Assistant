@@ -1,0 +1,44 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLSequenceAllInOne</id><coordinates><x>10</x><y>10</y><w>3050</w><h>1410</h></coordinates><panel_attributes>title=SD04 - Spending Analysis: Trends, Unusual Expenses, Recurring Payments (UC04, UC05, UC06, F06, F07, F08)
+desc=TrendAnalysisTool runs deterministic checks first
+obj=User~a
+obj=FinanceGUI~b
+obj=AgentFacade~c
+obj=Agent\nController~d
+obj=Planner~e
+obj=Transaction\nRepository~f
+obj=Tool\nManager~g
+obj=ToolFactory~h
+obj=TrendAnalysis\nTool~i
+obj=Prompt\nBuilder~j
+obj=Claude\nProvider~k
+obj=LLM\nService~l
+obj=Memory\nManager~m
+a-&gt;b : open Trends / Unusual / Subscriptions view
+b-&gt;c : analyzeSpending(type)
+c-&gt;d : processRequest(analysisRequest)
+d-&gt;e : decompose(request)
+e.&gt;d : Plan
+d-&gt;f : [loop: each month in plan] findByMonth(month)
+f.&gt;d : [loop: each month in plan] transactions
+d.&gt;c : [insufficient history] more data needed
+c.&gt;b : [insufficient history] more data needed
+b.&gt;a : [insufficient history] explain more history is required
+d-&gt;e : [enough history] executePlan(plan, history)
+e-&gt;g : [enough history] executeTool(trendAnalysis, args)
+g-&gt;h : [enough history] createTool(trendAnalysis)
+h.&gt;g : [enough history] TrendAnalysisTool
+g-&gt;i : [enough history] execute(input)
+i.&gt;g : [enough history] findings (trends, outliers, repeats)
+g-&gt;j : [enough history] buildPrompt(findings)
+j.&gt;g : [enough history] prompt
+g-&gt;k : [enough history] generate(prompt)
+k-&gt;l : [enough history] API request
+l.&gt;k : [enough history] response
+k.&gt;g : [enough history] narrative explanation
+g.&gt;e : [enough history] Result(findings, narrative)
+e.&gt;d : [enough history] Result
+d-&gt;m : [enough history] store(entry)
+d.&gt;c : [enough history] Result
+c.&gt;b : [enough history] Result
+b.&gt;a : [enough history] summary, flags, or subscription list
+</panel_attributes><additional_attributes></additional_attributes></element></diagram>

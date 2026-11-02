@@ -37,9 +37,14 @@ public class ReportGenerator {
     public String formatSummary(java.time.YearMonth month, List<Transaction> txs, Budget budget, String narrative, boolean partial) {
         BigDecimal income = BigDecimal.ZERO, spend = BigDecimal.ZERO;
         Map<Category, BigDecimal> cat = new EnumMap<>(Category.class);
-        for (Transaction t : txs) { if (t.getAmount().signum() >= 0) income = income.add(t.getAmount()); else { spend = spend.add(t.spent()); cat.merge(t.getCategory(), t.spent(), BigDecimal::add); } }
+        BigDecimal saved = BigDecimal.ZERO;   // transfers to savings are not spending
+        for (Transaction t : txs) {
+            if (t.getAmount().signum() >= 0) income = income.add(t.getAmount());
+            else if (t.getCategory() == Category.SAVINGS) saved = saved.add(t.spent());
+            else { spend = spend.add(t.spent()); cat.merge(t.getCategory(), t.spent(), BigDecimal::add); }
+        }
         StringBuilder b = new StringBuilder("MONTHLY SUMMARY " + month + (partial ? "  (PARTIAL - month not complete)" : "") + "\n");
-        b.append("Income: $").append(income).append("   Spending: $").append(spend).append("   Net: $").append(income.subtract(spend)).append('\n');
+        b.append("Income: $").append(income).append("   Spending: $").append(spend).append("   Saved: $").append(saved).append("   Net after spending: $").append(income.subtract(spend)).append('\n');
         cat.forEach((c, v) -> b.append(String.format("  %-14s $%s%s%n", c, v, budget != null && budget.getLimits().containsKey(c) ? " / limit $" + budget.getLimits().get(c) + (v.compareTo(budget.getLimits().get(c)) > 0 ? "  OVER" : "") : "")));
         b.append('\n').append(narrative).append('\n');
         return b.toString();

@@ -20,8 +20,8 @@ public class QueryTool implements Tool {
         d.append("transactions (id|date|amount|merchant|category):\n");
         for (Transaction t : ctx.transactions) d.append(t.getId()).append('|').append(t.getDate()).append('|').append(t.getAmount().toPlainString()).append('|').append(t.getMerchant()).append('|').append(t.getCategory()).append('\n');
         BigDecimal in = BigDecimal.ZERO, out = BigDecimal.ZERO;
-        for (Transaction t : ctx.transactions) if (t.getAmount().signum() >= 0) in = in.add(t.getAmount()); else out = out.add(t.spent());
-        d.append("computed totals: income=").append(in).append(" spending=").append(out).append('\n');
+        for (Transaction t : ctx.transactions) if (t.getAmount().signum() >= 0) in = in.add(t.getAmount()); else if (t.getCategory() != Category.SAVINGS) out = out.add(t.spent());
+        d.append("computed totals (savings transfers excluded from spending): income=").append(in).append(" spending=").append(out).append('\n');
         if (ctx.budget != null) {
             d.append("budget limits: ");
             ctx.budget.getLimits().forEach((c, v) -> d.append(c).append('=').append(v).append(" (spent ").append(ctx.budget.getSpent(c)).append(") "));

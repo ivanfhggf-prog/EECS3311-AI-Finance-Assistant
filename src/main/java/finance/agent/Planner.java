@@ -91,6 +91,8 @@ public class Planner {
             pc.notes.addAll(r.notes);
             Response resp = new Response(r.ok, r.text, pc.trace);
             pc.out.putAll(r.data);
+            // show the findings themselves, not just "N found"
+            for (String key : new String[]{"flags", "recurring"}) if (r.data.get(key) instanceof List) for (Object line : (List<?>) r.data.get(key)) resp.details.add(String.valueOf(line));
             return Plan.Outcome.stop(resp);
         });
     }

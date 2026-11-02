@@ -11,7 +11,7 @@ import java.util.*;
  * for a contextual judgment. Merchants the user dismissed before need a much larger ratio (fewer false positives).
  */
 public class UnusualExpenseTool implements Tool {
-    static final double CLEAR = 3.0, BORDER = 1.8, DISMISSED_CLEAR = 5.0;
+    static final double CLEAR = 3.0, BORDER = 1.8, DISMISSED_CLEAR = 5.0, FALLBACK_CLEAR = 8.0;
     private final Map<String, Double> ratios = new LinkedHashMap<>();
     private final List<Transaction> clear = new ArrayList<>(), borderline = new ArrayList<>();
     private final Map<String, Double> avgs = new HashMap<>();
@@ -20,12 +20,19 @@ public class UnusualExpenseTool implements Tool {
 
     @Override public Preparation prepare(ToolContext ctx, PromptBuilder pb) {
         ratios.clear(); clear.clear(); borderline.clear(); avgs.clear();
+        Double fallbackMedian = SpendingStats.fallbackMedian(ctx.history);
         for (Transaction t : ctx.transactions) {
             if (!t.isExpense() || !t.getCategory().isSpending() || t.getCategory() == Category.UNCATEGORIZED || t.isDismissedFlag()) continue;
             Double avg = SpendingStats.categoryAverageExcluding(ctx.history, t);
+            boolean fallback = false;
+            if (avg == null) { avg = fallbackMedian; fallback = true; }   // too few comparables in the category
             if (avg == null || avg <= 0) continue;
             double r = t.spent().doubleValue() / avg;
             boolean dismissed = ctx.memory.isDismissed(t.getMerchant());
+            if (fallback) {
+                if (r >= FALLBACK_CLEAR && !dismissed) { ratios.put(t.getId(), r); avgs.put(t.getId(), avg); clear.add(t); }
+                continue;
+            }
             ratios.put(t.getId(), r); avgs.put(t.getId(), avg);
             if (r >= (dismissed ? DISMISSED_CLEAR : CLEAR)) clear.add(t);
             else if (r >= BORDER && !dismissed) borderline.add(t);
@@ -67,7 +74,7 @@ public class UnusualExpenseTool implements Tool {
         List<String> lines = new ArrayList<>();
         List<String> ids = new ArrayList<>();
         for (Transaction t : clear) {
-            lines.add(String.format("%s %s $%s at %s: %.1fx the %s average ($%.2f).", t.getId(), t.getDate(), t.spent(), t.getMerchant(), ratios.get(t.getId()), t.getCategory(), avgs.get(t.getId())));
+            lines.add(String.format("%s %s $%s at %s: %.1fx the typical %s expense ($%.2f).", t.getId(), t.getDate(), t.spent(), t.getMerchant(), ratios.get(t.getId()), t.getCategory(), avgs.get(t.getId())));
             ids.add(t.getId());
         }
         for (Transaction t : aiFlagged) {

@@ -28,6 +28,20 @@ public final class SpendingStats {
         return others.stream().mapToDouble(o -> o.spent().doubleValue()).average().orElse(0);
     }
 
+    /**
+     * Median expense amount across non-recurring merchants; used as a fallback baseline when a category has too
+     * few comparable expenses (e.g. the first electronics purchase). Regular bills such as rent are excluded.
+     */
+    public static Double fallbackMedian(List<Transaction> all) {
+        Map<String, List<Transaction>> byMerchant = new HashMap<>();
+        for (Transaction t : all) if (t.isExpense()) byMerchant.computeIfAbsent(normalizeMerchant(t.getMerchant()), k -> new ArrayList<>()).add(t);
+        List<Double> amounts = new ArrayList<>();
+        for (List<Transaction> g : byMerchant.values()) if (frequency(g) == null) for (Transaction t : g) amounts.add(t.spent().doubleValue());
+        if (amounts.size() < 5) return null;
+        Collections.sort(amounts);
+        return amounts.get(amounts.size() / 2);
+    }
+
     public static String normalizeMerchant(String m) {
         String s = m.toLowerCase().replaceAll("\\.(com|ca|net|org)\\b", "").replaceAll("[^a-z]", "");
         return s;

@@ -1,0 +1,16 @@
+# Local secrets
+.env
+.env.*
+!.env.example
+config.local.json
+
+# Build output
+out/
+target/
+*.class
+
+# Local exports / OS / IDE
+exports/
+.DS_Store
+.idea/
+*.iml

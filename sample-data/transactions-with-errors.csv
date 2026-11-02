@@ -1,0 +1,7 @@
+date,amount,merchant,description
+2026-10-01,-12.50,Corner Cafe,Lunch
+2026-10-01,-12.50,Corner Cafe,Lunch
+not-a-date,-5.00,Bad Row,oops
+2026-10-03,abc,Bad Amount,oops
+2026-10-04,-30.00,,Missing merchant
+2026-10-05,-45.00,Metro,Groceries

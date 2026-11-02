@@ -1,0 +1,21 @@
+# Scripted CLI session used for the demonstration videos (needs LLM_API_KEY in .env)
+import sample-data/transactions.csv
+import sample-data/transactions-with-errors.csv
+categorize
+budget 2026-10 DINING=150 GROCERIES=300 RENT=1450
+track 2026-10
+trends
+unusual
+recurring
+ask How much did I spend on food in October?
+ask how much?
+ask What did I spend in December?
+summary 2026-10
+suggest
+goal Trip 2000 2027-06-01 300
+goals
+export csv 2026-10-01 2026-10-31 exports/october.csv
+export pdf 2026-10-01 2026-10-31 exports/october-summary.pdf summary
+undo
+log
+usage

@@ -21,8 +21,12 @@ public class UnusualExpenseTool implements Tool {
     @Override public Preparation prepare(ToolContext ctx, PromptBuilder pb) {
         ratios.clear(); clear.clear(); borderline.clear(); avgs.clear();
         Double fallbackMedian = SpendingStats.fallbackMedian(ctx.history);
+        // regular bills (rent, subscriptions...) repeat on a schedule, so a single charge is never "unusual"
+        Map<String, List<Transaction>> byMerchant = new HashMap<>();
+        for (Transaction h : ctx.history) if (h.isExpense()) byMerchant.computeIfAbsent(SpendingStats.normalizeMerchant(h.getMerchant()), k -> new ArrayList<>()).add(h);
         for (Transaction t : ctx.transactions) {
             if (!t.isExpense() || !t.getCategory().isSpending() || t.getCategory() == Category.UNCATEGORIZED || t.isDismissedFlag()) continue;
+            if (SpendingStats.frequency(byMerchant.getOrDefault(SpendingStats.normalizeMerchant(t.getMerchant()), List.of())) != null) continue;
             Double avg = SpendingStats.categoryAverageExcluding(ctx.history, t);
             boolean fallback = false;
             if (avg == null) { avg = fallbackMedian; fallback = true; }   // too few comparables in the category

@@ -26,7 +26,7 @@ public class ClaudeProvider implements LLMProvider {
         if (apiKey.isBlank() || apiKey.startsWith("YOUR_")) throw new LLMException("No LLM API key configured. Copy .env.example to .env and set LLM_API_KEY.");
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("model", model);
-        body.put("max_tokens", 3000);
+        body.put("max_tokens", 8000);
         body.put("system", p.system);
         body.put("messages", List.of(Map.of("role", "user", "content", p.user)));
         HttpRequest req = HttpRequest.newBuilder(URI.create(baseUrl + "/v1/messages"))
@@ -54,6 +54,7 @@ public class ClaudeProvider implements LLMProvider {
                 UsageTracker.outputTokens.addAndGet(((Number) u.getOrDefault("output_tokens", 0.0)).longValue());
             }
             UsageTracker.calls.incrementAndGet();
+            if ("max_tokens".equals(m.get("stop_reason")) && !out.toString().isBlank()) out.append("\n\n[Note: the AI answer hit its length limit and may be cut off.]");
             if (out.toString().isBlank()) throw new LLMException("LLM returned an empty answer");
             return out.toString();
         } catch (RuntimeException e) { throw new LLMException("Unexpected LLM response format", e); }

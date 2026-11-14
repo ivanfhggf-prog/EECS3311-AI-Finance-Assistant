@@ -38,5 +38,5 @@ public class QueryTool implements Tool {
         return Preparation.needsLlm(pb.buildPrompt(name(), task, d.toString()));
     }
 
-    @Override public ToolResult execute(ToolContext ctx, String resp) { return ToolResult.ok(resp.trim()); }
+    @Override public ToolResult execute(ToolContext ctx, String resp) { return ToolResult.ok(resp.replace("**", "").trim()); }
 }

@@ -23,12 +23,14 @@ public class ReportGenerator {
     public String transactionsText(List<Transaction> txs, LocalDate from, LocalDate to) {
         StringBuilder b = new StringBuilder("TRANSACTION REPORT " + from + " to " + to + "\n\n");
         Map<Category, BigDecimal> totals = new EnumMap<>(Category.class);
-        BigDecimal income = BigDecimal.ZERO, spend = BigDecimal.ZERO;
+        BigDecimal income = BigDecimal.ZERO, spend = BigDecimal.ZERO, saved = BigDecimal.ZERO;   // savings transfers are not spending
         for (Transaction t : txs) {
             b.append(t).append('\n');
-            if (t.getAmount().signum() >= 0) income = income.add(t.getAmount()); else { spend = spend.add(t.spent()); totals.merge(t.getCategory(), t.spent(), BigDecimal::add); }
+            if (t.getAmount().signum() >= 0) income = income.add(t.getAmount());
+            else if (t.getCategory() == Category.SAVINGS) saved = saved.add(t.spent());
+            else { spend = spend.add(t.spent()); totals.merge(t.getCategory(), t.spent(), BigDecimal::add); }
         }
-        b.append("\nIncome: $").append(income).append("\nSpending: $").append(spend).append("\n\nSpending by category:\n");
+        b.append("\nIncome: $").append(income).append("\nSpending: $").append(spend).append("\nSaved (transfers to savings): $").append(saved).append("\n\nSpending by category:\n");
         totals.forEach((c, v) -> b.append(String.format("  %-14s $%s%n", c, v)));
         return b.toString();
     }

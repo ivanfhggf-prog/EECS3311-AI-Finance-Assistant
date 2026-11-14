@@ -48,5 +48,5 @@ public class GuiSmoke {
         System.exit(bars[0] == 2 ? 0 : 1);
     }
 
-    static void count(Container c, int[] n) { for (Component x : c.getComponents()) { if (x instanceof JProgressBar) n[0]++; if (x instanceof Container) count((Container) x, n); } }
+    static void count(Container c, int[] n) { for (Component x : c.getComponents()) { if (x.getClass().getSimpleName().equals("SpendBar")) n[0]++; if (x instanceof Container) count((Container) x, n); } }
 }

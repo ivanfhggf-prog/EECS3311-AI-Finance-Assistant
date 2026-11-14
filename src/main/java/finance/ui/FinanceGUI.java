@@ -124,6 +124,24 @@ public class FinanceGUI extends JFrame implements BudgetObserver {
         return p;
     }
 
+    /** Self-painted progress bar so the colour (green / red when over budget) is the same on every OS look-and-feel. */
+    private static final class SpendBar extends JComponent {
+        private final int pct; private final boolean over; private final String label;
+        SpendBar(int pct, boolean over, String label) { this.pct = pct; this.over = over; this.label = label; }
+        @Override protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            int w = getWidth(), h = getHeight();
+            g2.setColor(new Color(0xE3E3E3)); g2.fillRoundRect(0, 0, w, h, 12, 12);
+            g2.setColor(over ? new Color(0xEF5350) : new Color(0x81C784)); g2.fillRoundRect(0, 0, Math.max(12, w * pct / 100), h, 12, 12);
+            g2.setColor(Color.BLACK); g2.setFont(getFont().deriveFont(Font.BOLD, 13f));
+            FontMetrics fm = g2.getFontMetrics();
+            g2.drawString(label, (w - fm.stringWidth(label)) / 2, (h + fm.getAscent() - fm.getDescent()) / 2);
+            g2.dispose();
+        }
+    }
+
     /** Observer callback: redraw per-category progress bars. */
     @Override public void update(Budget b) {
         Runnable r = () -> {
@@ -131,11 +149,9 @@ public class FinanceGUI extends JFrame implements BudgetObserver {
             barsPanel.add(new JLabel("Budget " + b.getMonth() + " - total limit $" + b.totalLimit()));
             b.getLimits().forEach((c, lim) -> {
                 int pct = (int) Math.min(100, Math.round(b.getSpent(c).doubleValue() * 100 / lim.doubleValue()));
-                JProgressBar bar = new JProgressBar(0, 100);
-                bar.setValue(pct); bar.setStringPainted(true);
-                bar.setString(c + ": $" + b.getSpent(c) + " / $" + lim + (b.isOver(c) ? "  OVER BUDGET" : ""));
-                bar.setForeground(b.isOver(c) ? Color.RED : new Color(0x2E7D32));
-                bar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+                SpendBar bar = new SpendBar(pct, b.isOver(c), c + ": $" + b.getSpent(c) + " / $" + lim + (b.isOver(c) ? "  OVER BUDGET" : ""));
+                bar.setPreferredSize(new Dimension(400, 30));
+                bar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
                 barsPanel.add(Box.createVerticalStrut(6)); barsPanel.add(bar);
             });
             barsPanel.revalidate(); barsPanel.repaint();

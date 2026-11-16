@@ -5,6 +5,7 @@ An AI agent that imports bank transactions, categorizes them with an LLM, tracks
 * Stage 1 design: [docs/stage1/STAGE1.md](docs/stage1/STAGE1.md)
 * Stage 2 report: [docs/stage2/stage2-report.pdf](docs/stage2/stage2-report.pdf) (Word version alongside)
 * Demonstration script for the videos: [docs/stage2/DEMO-SCRIPT.md](docs/stage2/DEMO-SCRIPT.md)
+* Demonstration videos: see [Demonstration videos](#demonstration-videos) below
 
 ## Prerequisites
 
@@ -20,6 +21,44 @@ cp .env.example .env        # Windows: copy .env.example .env
 ```
 
 `.env` is listed in `.gitignore` and must never be committed. Optional settings in `.env`: `LLM_MODEL` (default `claude-haiku-5-5`, a cheap model) and `LLM_BASE_URL`.
+
+### How to get an API key (Anthropic Claude)
+
+The app calls the Anthropic Messages API, so each user needs their own key. No key is included in this repository.
+
+1. Create an account at <https://console.anthropic.com> (this is separate from a claude.ai chat account).
+2. Under **Billing**, add a small amount of credit (for example US$5). Running every feature a few times costs a few cents with the default `claude-haiku-5-5` model.
+3. Under **API keys**, click **Create key**, name it, and copy it immediately: it is shown only once.
+4. Put it in your local `.env` as `LLM_API_KEY=sk-ant-...` (no quotes or spaces) and save. Never paste it into source code, the report or a screenshot.
+5. Run `./build.sh` and then `./run.sh cli` or `./run.sh gui`. The CLI banner shows `LLM: Claude (...)` when a key is found; `usage` prints the number of calls and tokens used.
+
+Without a key the deterministic features (import, correction, budgets, tracking, goals, export) still work; the AI features report that no key is configured.
+
+## Demonstration videos
+
+Google Drive links (set to “Anyone with the link”). Drive cannot deep-link to a time, so the start of each feature is listed (mm:ss). The same index with links is in Section 7 of the [Stage 2 report](docs/stage2/stage2-report.pdf).
+
+* [**Video A: CLI**](https://drive.google.com/file/d/1KAVlv_dHQl3HMMgV1IkO_FQSXi0ebfEN/view?usp=sharing)
+* [**Video B: GUI**](https://drive.google.com/file/d/1R-IiAiZUZ6882VRqwqbLxYCEMF-li-ki/view?usp=sharing)
+* [**Video C: exported files opened after the GUI export**](https://drive.google.com/file/d/1367FFBdWKuAF9SnBBNAo13cmbDxaYdfC/view?usp=sharing)
+
+| Feature | Video A (CLI) | Video B (GUI) |
+|---|---|---|
+| F01 Import transactions | 1:07 (error case 9:12) | 0:29 (error case 8:49) |
+| F02 Categorization | 1:30 | 0:46 |
+| F03 Manual correction and undo | 2:50 | 1:03 |
+| F04 Budget creation | 3:25 | 1:24 |
+| F05 Budget tracking | 3:55 | 1:24 (with F04) |
+| F06 Trends | 4:19 | 2:29 |
+| F07 Unusual expenses | 4:51 | 2:49 |
+| F08 Recurring payments | 5:38 | 3:26 |
+| F09 Natural-language query | 6:07 | 4:26 |
+| F10 Monthly summary | 7:12 | 5:23 |
+| F11 Saving suggestions | 7:38 | 5:38 |
+| F12 Savings goals | 8:18 | 6:08 |
+| F13 Report export | 8:43 (files opened 10:09) | 7:09 (files opened in Video C) |
+
+The empty-data error cases for F07 and F11 are shown at the start of both videos, before F01. No API key appears in any recording.
 
 ## Build and run
 

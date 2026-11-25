@@ -41,6 +41,7 @@ Google Drive links (set to “Anyone with the link”). Drive cannot deep-link t
 * [**Video A: CLI**](https://drive.google.com/file/d/1KAVlv_dHQl3HMMgV1IkO_FQSXi0ebfEN/view?usp=sharing)
 * [**Video B: GUI**](https://drive.google.com/file/d/1R-IiAiZUZ6882VRqwqbLxYCEMF-li-ki/view?usp=sharing)
 * [**Video C: exported files opened after the GUI export**](https://drive.google.com/file/d/1367FFBdWKuAF9SnBBNAo13cmbDxaYdfC/view?usp=sharing)
+* [**Video D: standalone CLI, `java -jar Agent.jar -LLMAPI -input sample-data/task.txt` with the real Claude API**](https://drive.google.com/file/d/1FX4hvXojwADaY3WWfjl_uGE5uOff-Ncu/view?usp=sharing)
 
 | Feature | Video A (CLI) | Video B (GUI) |
 |---|---|---|
@@ -115,6 +116,8 @@ export csv 2026-10-01 2026-10-31 exports/task-october.csv
 ```
 
 ### Working example
+
+Recorded run: [Video D](https://drive.google.com/file/d/1FX4hvXojwADaY3WWfjl_uGE5uOff-Ncu/view?usp=sharing).
 
 Output abbreviated with `...`; the AI answer is the one Claude gave in our own run.
 

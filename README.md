@@ -93,6 +93,8 @@ java -jar Agent.jar -LLMAPI -input sample-data/task.txt
 | `-cli` / `-gui` | Interactive command line / graphical interface. |
 | `-help` | List the options. |
 
+**Network note:** on an IPv6-only network (for example a phone hotspot) Java can print `Network is unreachable` even though the internet works. Add `-Djava.net.preferIPv6Addresses=true` after `java`, e.g. `java -Djava.net.preferIPv6Addresses=true -jar Agent.jar -LLMAPI -input sample-data/task.txt`.
+
 **Exit code:** `0` if every step succeeded, `1` if any step failed (a `FAILED:` or `Error:` line), `2` for invalid options or an unreadable task file.
 
 ### Task file format

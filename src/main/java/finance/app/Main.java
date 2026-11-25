@@ -19,8 +19,12 @@ import java.nio.file.*;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        System.exit(run(args, System.in, System.out, System.err));
+        int code = run(args, System.in, System.out, System.err);
+        if (code != KEEP_RUNNING) System.exit(code);   // the GUI keeps the JVM alive until its window is closed
     }
+
+    /** Returned by run() when the GUI was started: the process must not exit. */
+    public static final int KEEP_RUNNING = -1;
 
     /** Runs the agent and returns the process exit code (0 ok, 1 a step failed, 2 bad options or input). */
     public static int run(String[] args, InputStream stdin, PrintStream stdout, PrintStream stderr) throws IOException {
@@ -40,7 +44,7 @@ public class Main {
         if (mode == CliOptions.Mode.GUI) {
             if (GraphicsEnvironment.isHeadless()) { stderr.println("No display available; use -cli or -input <file>."); return 2; }
             FinanceGUI.launch(facade);
-            return 0;
+            return KEEP_RUNNING;
         }
         PrintStream out = stdout;
         PrintStream file = null;

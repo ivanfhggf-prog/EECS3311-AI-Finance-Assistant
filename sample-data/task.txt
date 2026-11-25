@@ -1,0 +1,13 @@
+# Task for the standalone agent:  java -jar Agent.jar -LLMAPI -input sample-data/task.txt
+# One command or plain-language request per line. Lines starting with # are ignored.
+# Goal: load my bank export, categorize it, set an October budget and tell me where I overspent and how to save.
+import sample-data/transactions.csv
+categorize
+budget 2026-10 DINING=150 GROCERIES=300 RENT=1450
+track 2026-10
+unusual
+recurring
+How much did I spend on dining in October?
+summary 2026-10
+suggest
+export csv 2026-10-01 2026-10-31 exports/task-october.csv

@@ -30,7 +30,7 @@ The app calls the Anthropic Messages API, so each user needs their own key. No k
 2. Under **Billing**, add a small amount of credit (for example US$5). Running every feature a few times costs a few cents with the default `claude-haiku-5-5` model.
 3. Under **API keys**, click **Create key**, name it, and copy it immediately: it is shown only once.
 4. Put it in your local `.env` as `LLM_API_KEY=sk-ant-...` (no quotes or spaces) and save. Never paste it into source code, the report or a screenshot.
-5. Run `./build.sh` and then `./run.sh cli` or `./run.sh gui`. The CLI banner shows `LLM: Claude (...)` when a key is found; `usage` prints the number of calls and tokens used.
+5. Run `./build.sh` and then `java -jar Agent.jar -cli` or `java -jar Agent.jar -gui`. The CLI banner shows `LLM: Claude (...)` when a key is found; `usage` prints the number of calls and tokens used.
 
 Without a key the deterministic features (import, correction, budgets, tracking, goals, export) still work; the AI features report that no key is configured.
 
@@ -63,13 +63,89 @@ The empty-data error cases for F07 and F11 are shown at the start of both videos
 ## Build and run
 
 ```bash
-./build.sh                                  # Windows: build.bat
-./run.sh gui                                # Windows: run.bat gui
-./run.sh cli                                # interactive command line
-./run.sh cli --script sample-data/demo-script.txt   # run a scripted session
+./build.sh                                  # Windows: build.bat   -> compiles into out/ and packages Agent.jar
+java -jar Agent.jar -gui                    # graphical interface  (./run.sh gui also works)
+java -jar Agent.jar -cli                    # interactive command line (./run.sh cli also works)
+java -jar Agent.jar -LLMAPI -input sample-data/task.txt    # standalone agent: run a task file and exit
 ```
 
-If you run without arguments, the GUI starts when a display is available, otherwise the CLI.
+If you run without arguments, the GUI starts when a display is available, otherwise the interactive CLI.
+
+## Standalone CLI (Agent.jar)
+
+`Agent.jar` is a self-contained version of the agent that runs directly from a terminal (Java 17+, no other files needed except your `.env`). It reads a **task file**, runs every step, prints the results and exits, so it can be used from scripts and automated tests.
+
+```bash
+./build.sh                                              # creates Agent.jar
+java -jar Agent.jar -LLMAPI -input sample-data/task.txt
+```
+
+### Supported options
+
+| Option | Meaning |
+|---|---|
+| `-input <file>` | Run the task in `<file>`, then exit. `-input -` reads the task from standard input. |
+| `-LLMAPI [name]` | LLM backend: `claude` (default; needs `LLM_API_KEY` in `.env`) or `none` (AI features switched off, deterministic features still run). `-LLMAPI` on its own means `claude`. |
+| `-model <name>` | Model to use (default `claude-haiku-5-5`; overrides `LLM_MODEL`). |
+| `-env <file>` | Settings file holding `LLM_API_KEY` (default `./.env`). |
+| `-output <file>` | Also save everything the agent prints to `<file>`. |
+| `-notrace` | Hide the agent's `[plan: ...]` lines. |
+| `-cli` / `-gui` | Interactive command line / graphical interface. |
+| `-help` | List the options. |
+
+**Exit code:** `0` if every step succeeded, `1` if any step failed (a `FAILED:` or `Error:` line), `2` for invalid options or an unreadable task file.
+
+### Task file format
+
+One step per line; lines starting with `#` are ignored. A step is either a CLI command (the same commands as the interactive CLI, see `help` and [Example usage](#example-usage-cli)) or a plain-language request of three or more words, which the agent treats as a question (F09). The included [`sample-data/task.txt`](sample-data/task.txt):
+
+```text
+import sample-data/transactions.csv
+categorize
+budget 2026-10 DINING=150 GROCERIES=300 RENT=1450
+track 2026-10
+unusual
+recurring
+How much did I spend on dining in October?
+summary 2026-10
+suggest
+export csv 2026-10-01 2026-10-31 exports/task-october.csv
+```
+
+### Working example
+
+Output abbreviated with `...`; the AI answer is the one Claude gave in our own run.
+
+```text
+$ java -jar Agent.jar -LLMAPI -input sample-data/task.txt -output result.txt
+Running task sample-data/task.txt with LLM: Claude (claude-haiku-5-5) +retry
+finance> import sample-data/transactions.csv
+Imported 59 transaction(s); 0 duplicate(s) skipped; 0 bad row(s).
+finance> categorize
+Categorized 59 transaction(s); 0 need manual review.
+  [plan: fetch uncategorized transactions -> categorize batch (CategorizerTool) -> ...]
+finance> budget 2026-10 DINING=150 GROCERIES=300 RENT=1450
+Budget for 2026-10 created with 3 categories, total $1900.
+...
+finance> How much did I spend on dining in October?
+  (not a command: sent to the agent as 'ask')
+You spent $248.88 on dining in October 2026, across 7 transactions ...
+  [plan: interpret question (QueryInterpreterTool) -> retrieve matching transactions -> answer with retrieved context (QueryTool)]
+...
+finance> export csv 2026-10-01 2026-10-31 exports/task-october.csv
+Exported 23 transaction(s) to exports/task-october.csv
+Task finished: all steps succeeded.
+LLM usage: ...
+```
+
+Other examples:
+
+```bash
+java -jar Agent.jar -LLMAPI none -input sample-data/task.txt        # no API key needed; AI steps report "AI is switched off"
+echo "import sample-data/transactions.csv
+recurring" | java -jar Agent.jar -input -                           # task from standard input
+java -jar Agent.jar -LLMAPI claude -model claude-haiku-5-5 -input sample-data/demo-script.txt -notrace
+```
 
 ## Example usage (CLI)
 
@@ -104,12 +180,12 @@ Compiles everything with `javac` and runs the Stage 2 verification suite (plain 
 
 ```
 src/main/java/finance/
-  app/      Main, AgentFacade            (Facade)
+  app/      Main, CliOptions (standalone CLI options), AgentFacade (Facade)
   ui/       FinanceCLI, FinanceGUI       (the GUI is the BudgetObserver)
   agent/    AgentController, Planner, Plan, MemoryManager, ToolManager, PromptBuilder
   tools/    Tool, ToolCreator/ToolFactory (Factory Method), Categorizer/Trend/Unusual/Recurring/Query tools
   command/  Command + Import/CorrectCategory/CreateBudget/SaveGoal, CommandHistory (undo)
-  llm/      LLMProvider (Strategy), ClaudeProvider, RetryingLLMProvider (Decorator)
+  llm/      LLMProvider (Strategy), ClaudeProvider, DisabledProvider (-LLMAPI none), RetryingLLMProvider (Decorator)
   domain/   Transaction, Category, Budget (Observer subject), SavingsGoal
   data/     TransactionRepository (in-memory)
   report/   ReportGenerator (CSV/TXT/PDF)

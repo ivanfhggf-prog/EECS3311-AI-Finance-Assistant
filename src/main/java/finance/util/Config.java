@@ -7,6 +7,10 @@ import java.util.*;
 /** Loads settings from environment variables, then a local .env file (never committed). */
 public final class Config {
     private final Map<String, String> values = new HashMap<>();
+    private final Map<String, String> overrides = new HashMap<>();   // command-line options win over everything
+
+    /** Sets a value from a command-line option (for example -model); it takes priority over the environment and .env. */
+    public Config set(String key, String value) { overrides.put(key, value); return this; }
 
     public static Config load() { return load(Paths.get(".env")); }
 
@@ -30,6 +34,8 @@ public final class Config {
     }
 
     public String get(String key, String dflt) {
+        String o = overrides.get(key);
+        if (o != null && !o.isBlank()) return o;
         String env = System.getenv(key);
         if (env != null && !env.isBlank()) return env;
         String v = values.get(key);

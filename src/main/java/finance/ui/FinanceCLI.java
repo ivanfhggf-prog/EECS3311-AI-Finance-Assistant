@@ -17,10 +17,12 @@ public class FinanceCLI {
     private final AgentFacade facade;
     private final PrintStream out;
     private final boolean showTrace;
+    private int failures;
 
     public FinanceCLI(AgentFacade f, PrintStream out, boolean showTrace) { this.facade = f; this.out = out; this.showTrace = showTrace; }
 
-    public void run(BufferedReader in, boolean interactive) throws IOException {
+    /** Runs commands until end of input or quit; returns how many commands failed (used as the CLI exit code). */
+    public int run(BufferedReader in, boolean interactive) throws IOException {
         if (interactive) out.println("AI Personal Finance Assistant (CLI). Type 'help'. LLM: " + facade.llmName());
         while (true) {
             if (interactive) { out.print("finance> "); out.flush(); }
@@ -31,8 +33,9 @@ public class FinanceCLI {
             if (!interactive) out.println("finance> " + line);
             if (line.equals("quit") || line.equals("exit")) break;
             try { handle(line); }
-            catch (RuntimeException e) { out.println("Error: " + e.getMessage()); }
+            catch (RuntimeException e) { failures++; out.println("Error: " + e.getMessage()); }
         }
+        return failures;
     }
 
     void handle(String line) {
@@ -77,7 +80,11 @@ public class FinanceCLI {
             case "undo": out.println(facade.undo()); break;
             case "log": facade.commandLog().forEach(out::println); break;
             case "usage": out.println("LLM usage this session: " + facade.usage()); break;
-            default: out.println("Unknown command '" + cmd + "'. Type 'help'.");
+            default:
+                // A task file may contain plain-language requests: anything that is not a command but reads like a
+                // sentence is handed to the agent as a question (F09), so "How much did I spend on dining?" works.
+                if (p.length >= 3) { out.println("  (not a command: sent to the agent as 'ask')"); print(facade.askQuery(line)); }
+                else { failures++; out.println("Unknown command '" + cmd + "'. Type 'help'."); }
         }
     }
 
@@ -87,9 +94,10 @@ public class FinanceCLI {
 
     private void need(String[] p, int n, String usage) { if (p.length < n) throw new IllegalArgumentException("Usage: " + usage); }
 
-    private void print(CommandResult r) { out.println((r.ok ? "" : "FAILED: ") + r); }
+    private void print(CommandResult r) { if (!r.ok) failures++; out.println((r.ok ? "" : "FAILED: ") + r); }
 
     private void print(Response r) {
+        if (!r.ok) failures++;
         out.println((r.ok ? "" : "FAILED: ") + r);
         if (r.data.get("chart") != null) out.println("  chart data: " + r.data.get("chart"));
         if (showTrace && !r.trace.isEmpty()) out.println("  [plan: " + String.join(" -> ", r.trace) + "]");
@@ -110,6 +118,7 @@ public class FinanceCLI {
                 "suggest                                   F11 saving suggestions",
                 "goal <name> <target> <YYYY-MM-DD> [amt]   F12 savings goal | goals = progress",
                 "export <csv|txt|pdf> <from> <to> <file> [summary]   F13 export",
-                "undo | log | usage | quit"));
+                "undo | log | usage | quit",
+                "Any other line of three or more words is treated as a question (ask)."));
     }
 }

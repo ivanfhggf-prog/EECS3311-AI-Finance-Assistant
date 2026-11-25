@@ -292,6 +292,47 @@ public class TestRunner {
             String o = bo.toString(); check(o.contains("Imported 59") && o.contains("Categorized 59") && o.contains("Unknown command") && o.contains("FAILED: Invalid category"), o);
         });
 
+        // ---------- standalone CLI (java -jar Agent.jar ...)
+        test("CLI options: -LLMAPI -input task.txt", () -> {
+            finance.app.CliOptions o = finance.app.CliOptions.parse(new String[]{"-LLMAPI", "-input", "task.txt"});
+            eq(o.mode, finance.app.CliOptions.Mode.TASK_FILE, "mode"); eq(o.input, "task.txt", "input"); eq(o.llm, "claude", "llm");
+            o = finance.app.CliOptions.parse(new String[]{"-input", "-", "-LLMAPI", "none", "-notrace", "-model", "m1", "-output", "o.txt"});
+            eq(o.input, "-", "stdin"); eq(o.llm, "none", "none"); check(!o.trace, "notrace"); eq(o.model, "m1", "model"); eq(o.output, "o.txt", "output");
+            eq(finance.app.CliOptions.parse(new String[]{"cli", "--script", "x.txt"}).input, "x.txt", "legacy script form");
+            eq(finance.app.CliOptions.parse(new String[]{"-help"}).mode, finance.app.CliOptions.Mode.HELP, "help");
+        });
+        test("CLI options: bad input is rejected with a clear message", () -> {
+            for (String[] bad : new String[][]{{"-input"}, {"-LLMAPI", "gpt"}, {"-frobnicate"}}) {
+                try { finance.app.CliOptions.parse(bad); throw new AssertionError("accepted " + Arrays.toString(bad)); }
+                catch (IllegalArgumentException expected) { check(!expected.getMessage().isBlank(), "message"); }
+            }
+        });
+        test("CLI task file runs every line, sends plain-language lines to the agent, counts failures", () -> {
+            AgentFacade f = app(new FakeLLM());
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            String task = "# comment\nimport sample-data/transactions.csv\ncategorize\nHow much did I spend on dining in October?\ntrack 2027-01\n";
+            int failures = new finance.ui.FinanceCLI(f, new PrintStream(buf, true, StandardCharsets.UTF_8), true).run(new BufferedReader(new StringReader(task)), false);
+            String out = buf.toString(StandardCharsets.UTF_8);
+            check(out.contains("Imported 59"), "import ran"); check(out.contains("sent to the agent as 'ask'"), "question routed to ask");
+            eq(failures, 1, "only the month without a budget fails");
+        });
+        test("Main -input: missing task file gives exit code 2; -help gives 0", () -> {
+            ByteArrayOutputStream o = new ByteArrayOutputStream(), e = new ByteArrayOutputStream();
+            eq(finance.app.Main.run(new String[]{"-LLMAPI", "none", "-input", "no-such-task.txt"}, InputStream.nullInputStream(), new PrintStream(o), new PrintStream(e)), 2, "missing file");
+            eq(finance.app.Main.run(new String[]{"-help"}, InputStream.nullInputStream(), new PrintStream(o), new PrintStream(e)), 0, "help");
+            check(o.toString().contains("-input <file>"), "usage printed");
+        });
+        test("Main -LLMAPI none runs deterministic steps from standard input and reports AI as off", () -> {
+            ByteArrayOutputStream o = new ByteArrayOutputStream(), e = new ByteArrayOutputStream();
+            String task = "import sample-data/transactions.csv\nbudget 2026-10 RENT=1450\ncategorize\n";
+            int code = finance.app.Main.run(new String[]{"-LLMAPI", "none", "-input", "-", "-env", "no-such.env"},
+                    new ByteArrayInputStream(task.getBytes(StandardCharsets.UTF_8)), new PrintStream(o, true, StandardCharsets.UTF_8), new PrintStream(e));
+            String out = o.toString(StandardCharsets.UTF_8);
+            check(out.contains("Imported 59") && out.contains("Budget for 2026-10 created"), "deterministic steps ran: " + out);
+            check(out.contains("AI is switched off") || out.contains("need manual review"), "AI reported off: " + out);
+            check(code == 0 || code == 1, "exit code is 0 or 1");
+        });
+
         System.out.println("\n" + passed + " passed, " + failed + " failed");
         System.exit(failed == 0 ? 0 : 1);
     }
